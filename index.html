@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Analytics Dashboard - Smart Insights</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-decor decor-1"></div>
+    <div class="background-decor decor-2"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="glass-panel main-header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div>
+                    <h1>HR Analytics Platform</h1>
+                    <p>Phân tích cơ cấu nhân sự thông minh</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="icon-btn" title="Chuyển đổi giao diện">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Upload Section (Visible Initially) -->
+        <div id="upload-section" class="glass-panel upload-container active-section">
+            <div class="upload-area" id="drop-zone">
+                <input type="file" id="file-input" accept=".xlsx, .xls, .csv" hidden>
+                <div class="upload-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3>Tải lên dữ liệu nhân sự</h3>
+                <p>Kéo thả file Excel (hoặc CSV) vào đây hoặc <span class="highlight">nhấn để chọn file</span></p>
+                <div class="upload-hint">Hệ thống sẽ tự động phân tích và trích xuất cấu trúc phòng ban</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section (Hidden Initially) -->
+        <div id="dashboard-section" class="dashboard-grid hidden">
+            <!-- Top Stats Cards -->
+            <div class="stats-row">
+                <div class="glass-panel stat-card">
+                    <div class="stat-icon primary"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-info">
+                        <p>Tổng nhân sự</p>
+                        <h2 id="total-staff">0</h2>
+                    </div>
+                </div>
+                <div class="glass-panel stat-card">
+                    <div class="stat-icon secondary"><i class="fa-solid fa-briefcase"></i></div>
+                    <div class="stat-info">
+                        <p>PT Kinh Doanh & Sản Phẩm</p>
+                        <h2 id="total-group1">0</h2>
+                    </div>
+                </div>
+                <div class="glass-panel stat-card">
+                    <div class="stat-icon accent"><i class="fa-solid fa-gears"></i></div>
+                    <div class="stat-info">
+                        <p>Kỹ Thuật & Vận Hành</p>
+                        <h2 id="total-group2">0</h2>
+                    </div>
+                </div>
+                <div class="glass-panel stat-card">
+                    <div class="stat-icon warning"><i class="fa-solid fa-building-user"></i></div>
+                    <div class="stat-info">
+                        <p>Phòng ban / Khác</p>
+                        <h2 id="total-other">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="charts-row">
+                <!-- Ratio Chart -->
+                <div class="glass-panel chart-container">
+                    <div class="panel-header">
+                        <h3>Tỷ lệ nhân sự giữa các Khối</h3>
+                        <i class="fa-solid fa-chart-simple"></i>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="ratioChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Group 1 Details Chart -->
+                <div class="glass-panel chart-container">
+                    <div class="panel-header">
+                        <h3>Cơ cấu: PT Kinh Doanh & Sản Phẩm</h3>
+                        <i class="fa-solid fa-chart-bar"></i>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="group1Chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="charts-row">
+                <!-- Group 2 Details Chart -->
+                <div class="glass-panel chart-container">
+                    <div class="panel-header">
+                        <h3>Cơ cấu: Kỹ Thuật & Vận Hành</h3>
+                        <i class="fa-solid fa-chart-bar"></i>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="group2Chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI Report Section -->
+                <div class="glass-panel ai-report-container">
+                    <div class="panel-header ai-header">
+                        <div class="ai-title">
+                            <i class="fa-solid fa-robot"></i>
+                            <h3>AI Analyst Report</h3>
+                        </div>
+                        <span class="pulse-badge">Live</span>
+                    </div>
+                    <div class="ai-content" id="ai-report-content">
+                        <!-- AI content will be generated here -->
+                        <div class="loading-pulse">
+                            <div class="pulse-dot"></div>
+                            <div class="pulse-dot"></div>
+                            <div class="pulse-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions-row">
+                 <button id="reset-btn" class="glass-btn">
+                     <i class="fa-solid fa-rotate-left"></i> Phân tích file khác
+                 </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
